@@ -21,41 +21,41 @@ to setup
   ]
 
   create-exits 1 [
-    setxy ((max-pxcor / 2) - 1) max-pycor
+    setxy (round(max-pxcor / 2) - 1) max-pycor
     set shape "square"
     set color white
     ask patch-here [ set pcolor white ]
   ]
 
-  create-people 100 [
+  create-people n_young_male [
     (ifelse
-    priority = "Green" [
+    priority = "Young Male" [
       set group 1
     ]
-    priority = "Blue" [
-      set group 2
-    ]
-    [
-      set group 0
-    ])
-    set color green
-    move-to one-of patches with [not any? people-here and not any? exits-here and pcolor = white]
-    set target one-of exits
-    face target
-  ]
-
-  create-people 100 [
-    (ifelse
-    priority = "Blue" [
-      set group 1
-    ]
-    priority = "Green" [
+    priority = "Young Female" [
       set group 2
     ]
     [
       set group 0
     ])
     set color blue
+    move-to one-of patches with [not any? people-here and not any? exits-here and pcolor = white]
+    set target one-of exits
+    face target
+  ]
+
+  create-people n_young_female [
+    (ifelse
+    priority = "Young Female" [
+      set group 1
+    ]
+    priority = "Young Male" [
+      set group 2
+    ]
+    [
+      set group 0
+    ])
+    set color pink
     move-to one-of patches with [not any? people-here and not any? exits-here and pcolor = white]
     set target one-of exits
     face target
@@ -75,14 +75,6 @@ to go
   if (count people = 0)
   [ stop ]
   tick
-  set filename = (word ticks ".png")
-  (ifelse
-    ticks < 10 [
-      set filename ("00" word ticks ".png")
-    ]ticks <[
-
-
-  export-view (word ticks ".png")
 end
 
 
@@ -150,10 +142,10 @@ ticks
 30.0
 
 BUTTON
-128
-10
-194
-43
+65
+65
+129
+98
 NIL
 setup
 NIL
@@ -167,10 +159,10 @@ NIL
 1
 
 BUTTON
-132
-53
-195
-86
+173
+65
+236
+98
 NIL
 go
 T
@@ -186,12 +178,72 @@ NIL
 CHOOSER
 65
 106
-203
+236
 151
 priority
 priority
-"None" "Green" "Blue" "Distance"
+"None" "Young Male" "Young Female" "Old Male" "Old Female" "Young" "Old" "Male" "Female" "Distance to exit"
 0
+
+SLIDER
+64
+158
+236
+191
+n_young_male
+n_young_male
+0
+100
+50.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+64
+201
+236
+234
+n_young_female
+n_young_female
+0
+100
+50.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+65
+248
+237
+281
+n_old_male
+n_old_male
+0
+100
+50.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+65
+294
+237
+327
+n_old_female
+n_old_female
+0
+100
+50.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
