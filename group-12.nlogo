@@ -5,8 +5,8 @@ people-own [target group]
 
 to setup
   clear-all
-  resize-world 0 50 0 50
-  set-patch-size 10
+  resize-world 0 5 0 5
+  set-patch-size 25
 
   ;; walls
   ask patches [
@@ -65,7 +65,7 @@ to setup
 end
 
 to go
-  ifelse priority = "Distance" [
+  ifelse priority = "Distance to exit" [
     go-by-distance
   ][
     go-by-group
@@ -78,20 +78,35 @@ to go
 end
 
 
+to move
+  user-message (word "Turtle at " xcor word "," ycor word " color " color)
+  ;; if at exit, vanishes
+  ifelse (distance target = 0)
+  [
+    die
+  ][
+    ;; check if next patch is not a obstacle
+    if ([pcolor] of patch-ahead 1 = white) [
+      ;; check if next patch is empty
+      ifelse (count people-on patch-ahead 1 = 0) [
+         move-to patch-ahead 1
+       ][
+        ifelse (random 1 = 0) [ ;;random left or right
+          rt 45 ;;rotate right
+         ][
+          lt 45 ;;rotate left
+         ]
+        ;;move ;;recursively find empty spot ahead
+      ]
+    ]
+    face target
+  ]
+end
+
 to go-by-distance
   foreach sort-by [ [a b] -> [ distance target ] of a  < [ distance target ] of b ] people [ p ->
     ask p [
-      ;; if at exit, vanishes
-      ifelse (distance target = 0)
-      [
-        die
-      ][
-        ;; check if next patch is empty
-        if (count people-on patch-ahead 1 = 0) and ([pcolor] of patch-ahead 1 = white) [
-          move-to patch-ahead 1
-          face target
-        ]
-      ]
+      move
     ]
   ]
 end
@@ -99,29 +114,19 @@ end
 to go-by-group
   foreach sort-by [ [a b] -> [ group ] of a < [ group ] of b ] people [ p ->
     ask p [
-      ;; if at exit, vanishes
-      ifelse (distance target = 0)
-      [
-        die
-      ][
-        ;; check if next patch is empty
-        if (count people-on patch-ahead 1 = 0) and ([pcolor] of patch-ahead 1 = white) [
-          move-to patch-ahead 1
-          face target
-        ]
-      ]
+      move
     ]
   ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-210
-10
-728
-529
+284
+62
+442
+221
 -1
 -1
-10.0
+25.0
 1
 10
 1
@@ -132,9 +137,9 @@ GRAPHICS-WINDOW
 0
 1
 0
-50
+5
 0
-50
+5
 1
 1
 1
@@ -183,7 +188,7 @@ CHOOSER
 priority
 priority
 "None" "Young Male" "Young Female" "Old Male" "Old Female" "Young" "Old" "Male" "Female" "Distance to exit"
-0
+9
 
 SLIDER
 64
@@ -194,7 +199,7 @@ n_young_male
 n_young_male
 0
 100
-50.0
+8.0
 1
 1
 NIL
@@ -209,7 +214,7 @@ n_young_female
 n_young_female
 0
 100
-50.0
+8.0
 1
 1
 NIL
