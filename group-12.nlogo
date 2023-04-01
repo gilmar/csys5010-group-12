@@ -5,8 +5,8 @@ people-own [target group]
 
 to setup
   clear-all
-  resize-world 0 4 0 4
-  set-patch-size 100
+  resize-world 0 50 0 50
+  set-patch-size 10
 
   ;; walls
   ask patches [
@@ -21,13 +21,13 @@ to setup
   ]
 
   create-exits 1 [
-    setxy 2 4
+    setxy ((max-pxcor / 2) - 1) max-pycor
     set shape "square"
     set color white
     ask patch-here [ set pcolor white ]
   ]
 
-  create-people 1 [
+  create-people 100 [
     (ifelse
     priority = "Green" [
       set group 1
@@ -39,12 +39,12 @@ to setup
       set group 0
     ])
     set color green
-    move-to one-of patches with [pycor = 1 and not any? people-here and not any? exits-here and pcolor = white]
+    move-to one-of patches with [not any? people-here and not any? exits-here and pcolor = white]
     set target one-of exits
     face target
   ]
 
-  create-people 1 [
+  create-people 100 [
     (ifelse
     priority = "Blue" [
       set group 1
@@ -56,7 +56,7 @@ to setup
       set group 0
     ])
     set color blue
-    move-to one-of patches with [pycor = 1 and not any? people-here and not any? exits-here and pcolor = white]
+    move-to one-of patches with [not any? people-here and not any? exits-here and pcolor = white]
     set target one-of exits
     face target
   ]
@@ -75,6 +75,14 @@ to go
   if (count people = 0)
   [ stop ]
   tick
+  set filename = (word ticks ".png")
+  (ifelse
+    ticks < 10 [
+      set filename ("00" word ticks ".png")
+    ]ticks <[
+
+
+  export-view (word ticks ".png")
 end
 
 
@@ -117,11 +125,11 @@ end
 GRAPHICS-WINDOW
 210
 10
-718
-519
+728
+529
 -1
 -1
-100.0
+10.0
 1
 10
 1
@@ -132,9 +140,9 @@ GRAPHICS-WINDOW
 0
 1
 0
-4
+50
 0
-4
+50
 1
 1
 1
@@ -183,7 +191,7 @@ CHOOSER
 priority
 priority
 "None" "Green" "Blue" "Distance"
-2
+0
 
 @#$#@#$#@
 ## WHAT IS IT?
