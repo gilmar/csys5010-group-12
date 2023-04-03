@@ -1,11 +1,12 @@
 ;TODO
-;graph evacuation numbers
 ;Change exit number and sizes
 
 breed [exits exit]
 
 breed [people person]
 people-own [target group]
+
+globals [watched]
 
 to setup
 
@@ -106,6 +107,7 @@ end
 
 to move
   ;user-message (word "Turtle at " xcor word "," ycor word " color " color) ;DEBUG
+
   ;if at exit, vanishes
   (ifelse (distance target = 0)
   [
@@ -117,11 +119,10 @@ to move
     move-to target
   ][;move to empty patch closest to the target exit, if not blocking a priority group in the imminent cone of view (1 patch, 180 degrees).
     ;empty patches in the imminent cone of view (1 patch, 180 degrees)
-    let vacant_patches patches in-cone 1 180  with [(pcolor = white) and (not any? people-here)]
-    ;order by distance to exit; use patch-set to convert from list
+    let vacant_patches patches in-cone 1.5 180 with [(pcolor = white) and (not any? people-here)]
     if (any? vacant_patches) [
-      ;priority group people around, i.e. cone of view (2 patch, 180 degrees).
-      let surounding_priority_people people in-cone 2 360 with [(group < [group] of myself)]
+      ;priority group people around, i.e. cone of view (2 patch, 360 degrees).
+      let surounding_priority_people people in-radius 3 with [(group < [group] of myself)]
       ;patches priority people are facing
       ifelse (any? surounding_priority_people) [
         ;get the patches of the surrounding priority people
@@ -260,7 +261,7 @@ priority_proportion
 priority_proportion
 0
 1
-0.2
+0.8
 0.1
 1
 NIL
