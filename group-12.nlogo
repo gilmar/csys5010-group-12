@@ -5,8 +5,8 @@ people-own [target group]
 
 to setup
   clear-all
-  resize-world 0 5 0 5
-  set-patch-size 25
+  resize-world 0 50 0 50
+  set-patch-size 10
 
   ;; walls
   ask patches [
@@ -79,23 +79,40 @@ end
 
 
 to move
-  ;; user-message (word "Turtle at " xcor word "," ycor word " color " color)
+  ;; DEBUG user-message (word "Turtle at " xcor word "," ycor word " color " color)
   ;; if at exit, vanishes
-  ifelse (distance target = 0)
+  (ifelse (distance target = 0)
   [
     die
-  ][ ;; move to empty patch closest to the target exit
-    let vacant_neighbors neighbors with [pcolor = white and not any? people-here]
-    if (any? vacant_neighbors) [
-      ;; neighbor closest to exit: first item of a list sorted by distance
-      let candidate_patch first sort-by [ [a b] -> [ distance a ] of target < [ distance b ] of target ] vacant_neighbors
-      ;; check if closer than current position
-      if ([ distance candidate_patch ] of target < distance target) [
-        move-to candidate_patch
-      ]
-    ]
-    face target
   ]
+  ;; if in front of exit, just leave
+  (distance target = 1)
+  [
+    move-to target
+  ][;; move to empty patch closest to the target exit, if not blocking a priority group in the imminent cone of view (1 patch, 180 degrees).
+    ;; empty patches in the imminent cone of view (1 patch, 180 degrees)
+    let vacant_patches patches in-cone 1 180  with [(pcolor = white) and (not any? people-here)]
+    ;; order by distance to exit; use patch-set to convert from list
+    if (any? vacant_patches) [
+      ;; priority group people around, i.e. cone of view (2 patch, 180 degrees).
+      let surounding_priority_people people in-cone 2 360 with [(group < [group] of myself)]
+      ;; patches priority people are facing
+      ifelse (any? surounding_priority_people) [
+        ;; get the patches of the surrounding priority people
+        let priority_people_target_patches patch-set [patch-ahead 1] of surounding_priority_people
+        ;; patches no other priority people are targeting.
+        let candidate_patches vacant_patches with [not member? self priority_people_target_patches]
+        if (any? candidate_patches) [
+          ;; move to candidate patch closest to exit.
+          move-to first sort-by [ [a b] -> [ distance a ] of target < [ distance b ] of target ] candidate_patches
+        ];; othewise stay at the same place to give righ-of-way to priority group people to move first
+      ][ ;; no surrounding people
+        ;; move to patch closest to exit.
+        move-to first sort-by [ [a b] -> [ distance a ] of target < [ distance b ] of target ] vacant_patches
+      ]
+    ] ;; no vacant patches, can't move
+    face target
+  ])
 end
 
 to go-by-distance
@@ -117,8 +134,8 @@ end
 GRAPHICS-WINDOW
 284
 62
-442
-221
+417
+196
 -1
 -1
 25.0
@@ -132,9 +149,9 @@ GRAPHICS-WINDOW
 0
 1
 0
-5
+4
 0
-5
+4
 1
 1
 1
@@ -165,7 +182,7 @@ BUTTON
 98
 NIL
 go
-NIL
+T
 1
 T
 OBSERVER
@@ -194,7 +211,7 @@ n_young_male
 n_young_male
 0
 100
-8.0
+3.0
 1
 1
 NIL
@@ -209,7 +226,7 @@ n_young_female
 n_young_female
 0
 100
-8.0
+3.0
 1
 1
 NIL
