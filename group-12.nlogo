@@ -79,24 +79,19 @@ end
 
 
 to move
-  user-message (word "Turtle at " xcor word "," ycor word " color " color)
+  ;; user-message (word "Turtle at " xcor word "," ycor word " color " color)
   ;; if at exit, vanishes
   ifelse (distance target = 0)
   [
     die
-  ][
-    ;; check if next patch is not a obstacle
-    if ([pcolor] of patch-ahead 1 = white) [
-      ;; check if next patch is empty
-      ifelse (count people-on patch-ahead 1 = 0) [
-         move-to patch-ahead 1
-       ][
-        ifelse (random 1 = 0) [ ;;random left or right
-          rt 45 ;;rotate right
-         ][
-          lt 45 ;;rotate left
-         ]
-        ;;move ;;recursively find empty spot ahead
+  ][ ;; move to empty patch closest to the target exit
+    let vacant_neighbors neighbors with [pcolor = white and not any? people-here]
+    if (any? vacant_neighbors) [
+      ;; neighbor closest to exit: first item of a list sorted by distance
+      let candidate_patch first sort-by [ [a b] -> [ distance a ] of target < [ distance b ] of target ] vacant_neighbors
+      ;; check if closer than current position
+      if ([ distance candidate_patch ] of target < distance target) [
+        move-to candidate_patch
       ]
     ]
     face target
@@ -170,7 +165,7 @@ BUTTON
 98
 NIL
 go
-T
+NIL
 1
 T
 OBSERVER
@@ -188,7 +183,7 @@ CHOOSER
 priority
 priority
 "None" "Young Male" "Young Female" "Old Male" "Old Female" "Young" "Old" "Male" "Female" "Distance to exit"
-9
+2
 
 SLIDER
 64
