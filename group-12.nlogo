@@ -1,6 +1,5 @@
 ;TODO
-;Use population density
-;Use priority group proportion
+;graph evacuation numbers
 ;Change exit number and sizes
 
 breed [exits exit]
@@ -9,9 +8,20 @@ breed [people person]
 people-own [target group]
 
 to setup
+
+  ;create world
+  let box_x_patches  50
+  let box_y_patches  50
+  let n_patches (box_x_patches * box_y_patches)
+
   clear-all
-  resize-world 0 50 0 50
-  set-patch-size 10
+  ;add one to account for the borders
+  resize-world 0 (box_x_patches + 1) 0 (box_y_patches + 1)
+  ifelse (n_patches < 100) [
+    set-patch-size 50
+  ][
+    set-patch-size 10
+  ]
 
   ;draw walls
   ask patches [
@@ -25,6 +35,7 @@ to setup
     ]
   ]
 
+  ;draw exit
   create-exits 1 [
     setxy (round(max-pxcor / 2) - 1) max-pycor
     set shape "square"
@@ -32,35 +43,45 @@ to setup
     ask patch-here [ set pcolor white ]
   ]
 
-  create-people n_male [
-    (ifelse
-    priority = "Male" [
-      set group 1
-    ]
-    priority = "Female" [
-      set group 2
-    ]
+  ;create people
+  let n_people round(population_density * n_patches)
+  let n_priority round(priority_proportion * n_people)
+  let n_non_priority (n_people - n_priority)
+
+  let n_male round(n_people / 2)
+  let n_female round(n_people / 2)
+  let group_male 0
+  let group_female 0
+
+
+  (ifelse
+    (priority = "Male")
     [
-      set group 0
-    ])
-    set color blue
+      set n_male n_priority
+      set group_male 1
+      set n_female n_non_priority
+      set group_female 2
+    ]
+    (priority = "Female")
+    [
+      set n_female n_priority
+      set group_female 1
+      set n_male n_non_priority
+      set group_male 2
+    ]
+  )
+
+  create-people n_female [
+    set group group_female
+    set color pink
     move-to one-of patches with [not any? people-here and not any? exits-here and pcolor = white]
     set target one-of exits
     face target
   ]
 
-  create-people n_female [
-    (ifelse
-    priority = "Female" [
-      set group 1
-    ]
-    priority = "Male" [
-      set group 2
-    ]
-    [
-      set group 0
-    ])
-    set color pink
+  create-people n_male [
+    set group group_male
+    set color blue
     move-to one-of patches with [not any? people-here and not any? exits-here and pcolor = white]
     set target one-of exits
     face target
@@ -139,8 +160,8 @@ end
 GRAPHICS-WINDOW
 284
 62
-802
-581
+812
+591
 -1
 -1
 10.0
@@ -154,9 +175,9 @@ GRAPHICS-WINDOW
 0
 1
 0
-50
+51
 0
-50
+51
 1
 1
 1
@@ -205,19 +226,19 @@ CHOOSER
 priority
 priority
 "None" "Male" "Female" "Distance to exit"
-1
+2
 
 SLIDER
 64
 158
 236
 191
-n_male
-n_male
+population_density
+population_density
 0
-100
-48.0
 1
+0.8
+0.1
 1
 NIL
 HORIZONTAL
@@ -227,12 +248,12 @@ SLIDER
 201
 236
 234
-n_female
-n_female
+priority_proportion
+priority_proportion
 0
-100
-48.0
 1
+0.8
+0.1
 1
 NIL
 HORIZONTAL
