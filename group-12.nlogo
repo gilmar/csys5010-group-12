@@ -10,8 +10,8 @@ people-own [target group]
 to setup
 
   ;create world
-  let box_x_patches  5
-  let box_y_patches  5
+  let box_x_patches  50
+  let box_y_patches  50
   let n_patches (box_x_patches * box_y_patches)
 
   clear-all
@@ -168,11 +168,11 @@ end
 GRAPHICS-WINDOW
 284
 62
-642
-421
+812
+591
 -1
 -1
-50.0
+10.0
 1
 10
 1
@@ -183,9 +183,9 @@ GRAPHICS-WINDOW
 0
 1
 0
-6
+51
 0
-6
+51
 1
 1
 1
@@ -234,7 +234,7 @@ CHOOSER
 priority
 priority
 "None" "Male" "Female" "Distance to exit"
-2
+0
 
 SLIDER
 64
@@ -265,6 +265,25 @@ priority_proportion
 1
 NIL
 HORIZONTAL
+
+PLOT
+1003
+59
+1649
+305
+Number of people over time
+ticks
+number of people
+0.0
+10.0
+0.0
+10.0
+true
+true
+"" ""
+PENS
+"Males" 1.0 0 -13345367 true "" "plot count turtles with [color = blue]"
+"Females" 1.0 0 -2064490 true "" "plot count turtles with [color = pink]"
 
 @#$#@#$#@
 ## WHAT IS IT?
