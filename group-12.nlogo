@@ -10,8 +10,8 @@ people-own [target group]
 to setup
 
   ;create world
-  let box_x_patches  50
-  let box_y_patches  50
+  let box_x_patches  5
+  let box_y_patches  5
   let n_patches (box_x_patches * box_y_patches)
 
   clear-all
@@ -129,13 +129,21 @@ to move
         ;patches no other priority people are targeting.
         let candidate_patches vacant_patches with [not member? self priority_people_target_patches]
         if (any? candidate_patches) [
-          ;move to candidate patch closest to exit.
-          move-to first sort-by [ [a b] -> [ distance a ] of target < [ distance b ] of target ] candidate_patches
+          ;move to candidate patch closest to exit 95% of the time
+          ifelse (random 100 <= 95) [
+              move-to first sort-by [ [a b] -> [ distance a ] of target < [ distance b ] of target ] candidate_patches
+          ][
+              move-to one-of candidate_patches
+          ]
         ];othewise stay at the same place to give righ-of-way to priority group people to move first
       ][ ;no surrounding people
-        ;move to patch closest to exit.
-        move-to first sort-by [ [a b] -> [ distance a ] of target < [ distance b ] of target ] vacant_patches
-      ]
+          ;move to candidate patch closest to exit 95% of the time
+          ifelse (random 100 <= 95) [
+            move-to first sort-by [ [a b] -> [ distance a ] of target < [ distance b ] of target ] vacant_patches
+          ][
+            move-to one-of vacant_patches
+          ]
+        ]
     ] ;no vacant patches, can't move
     face target
   ])
@@ -160,11 +168,11 @@ end
 GRAPHICS-WINDOW
 284
 62
-812
-591
+642
+421
 -1
 -1
-10.0
+50.0
 1
 10
 1
@@ -175,9 +183,9 @@ GRAPHICS-WINDOW
 0
 1
 0
-51
+6
 0
-51
+6
 1
 1
 1
