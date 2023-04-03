@@ -234,7 +234,7 @@ CHOOSER
 priority
 priority
 "None" "Male" "Female" "Distance to exit"
-0
+2
 
 SLIDER
 64
@@ -245,7 +245,7 @@ population_density
 population_density
 0
 1
-0.8
+0.5
 0.1
 1
 NIL
@@ -260,7 +260,7 @@ priority_proportion
 priority_proportion
 0
 1
-0.8
+0.2
 0.1
 1
 NIL
