@@ -261,7 +261,7 @@ priority_proportion
 priority_proportion
 0
 1
-0.8
+0.5
 0.1
 1
 NIL
@@ -285,6 +285,17 @@ true
 PENS
 "Males" 1.0 0 -13345367 true "" "plot count turtles with [color = blue]"
 "Females" 1.0 0 -2064490 true "" "plot count turtles with [color = pink]"
+
+MONITOR
+1003
+10
+1114
+55
+Number of ticks
+ticks
+17
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
