@@ -1,3 +1,8 @@
+;TODO
+;Use population density
+;Use priority group proportion
+;Change exit number and sizes
+
 breed [exits exit]
 
 breed [people person]
@@ -8,10 +13,10 @@ to setup
   resize-world 0 50 0 50
   set-patch-size 10
 
-  ;; walls
+  ;draw walls
   ask patches [
     set pcolor white
-    ;; border
+    ;border
     if pxcor = min-pxcor
     or pycor = min-pycor
     or pxcor = max-pxcor
@@ -27,12 +32,12 @@ to setup
     ask patch-here [ set pcolor white ]
   ]
 
-  create-people n_young_male [
+  create-people n_male [
     (ifelse
-    priority = "Young Male" [
+    priority = "Male" [
       set group 1
     ]
-    priority = "Young Female" [
+    priority = "Female" [
       set group 2
     ]
     [
@@ -44,12 +49,12 @@ to setup
     face target
   ]
 
-  create-people n_young_female [
+  create-people n_female [
     (ifelse
-    priority = "Young Female" [
+    priority = "Female" [
       set group 1
     ]
-    priority = "Young Male" [
+    priority = "Male" [
       set group 2
     ]
     [
@@ -69,9 +74,9 @@ to go
     go-by-distance
   ][
     go-by-group
-    ;; notice that "None" orders by group, but as groups are 0 it acts as if it was random
+    ;notice that "None" orders by group, but as groups are 0 it acts as if it was random
   ]
-  ;;stop if no more people
+  ;stop if no more people
   if (count people = 0)
   [ stop ]
   tick
@@ -79,38 +84,38 @@ end
 
 
 to move
-  ;; DEBUG user-message (word "Turtle at " xcor word "," ycor word " color " color)
-  ;; if at exit, vanishes
+  ;user-message (word "Turtle at " xcor word "," ycor word " color " color) ;DEBUG
+  ;if at exit, vanishes
   (ifelse (distance target = 0)
   [
     die
   ]
-  ;; if in front of exit, just leave
+  ;if in front of exit, just leave
   (distance target = 1)
   [
     move-to target
-  ][;; move to empty patch closest to the target exit, if not blocking a priority group in the imminent cone of view (1 patch, 180 degrees).
-    ;; empty patches in the imminent cone of view (1 patch, 180 degrees)
+  ][;move to empty patch closest to the target exit, if not blocking a priority group in the imminent cone of view (1 patch, 180 degrees).
+    ;empty patches in the imminent cone of view (1 patch, 180 degrees)
     let vacant_patches patches in-cone 1 180  with [(pcolor = white) and (not any? people-here)]
-    ;; order by distance to exit; use patch-set to convert from list
+    ;order by distance to exit; use patch-set to convert from list
     if (any? vacant_patches) [
-      ;; priority group people around, i.e. cone of view (2 patch, 180 degrees).
+      ;priority group people around, i.e. cone of view (2 patch, 180 degrees).
       let surounding_priority_people people in-cone 2 360 with [(group < [group] of myself)]
-      ;; patches priority people are facing
+      ;patches priority people are facing
       ifelse (any? surounding_priority_people) [
-        ;; get the patches of the surrounding priority people
+        ;get the patches of the surrounding priority people
         let priority_people_target_patches patch-set [patch-ahead 1] of surounding_priority_people
-        ;; patches no other priority people are targeting.
+        ;patches no other priority people are targeting.
         let candidate_patches vacant_patches with [not member? self priority_people_target_patches]
         if (any? candidate_patches) [
-          ;; move to candidate patch closest to exit.
+          ;move to candidate patch closest to exit.
           move-to first sort-by [ [a b] -> [ distance a ] of target < [ distance b ] of target ] candidate_patches
-        ];; othewise stay at the same place to give righ-of-way to priority group people to move first
-      ][ ;; no surrounding people
-        ;; move to patch closest to exit.
+        ];othewise stay at the same place to give righ-of-way to priority group people to move first
+      ][ ;no surrounding people
+        ;move to patch closest to exit.
         move-to first sort-by [ [a b] -> [ distance a ] of target < [ distance b ] of target ] vacant_patches
       ]
-    ] ;; no vacant patches, can't move
+    ] ;no vacant patches, can't move
     face target
   ])
 end
@@ -134,11 +139,11 @@ end
 GRAPHICS-WINDOW
 284
 62
-417
-196
+802
+581
 -1
 -1
-25.0
+10.0
 1
 10
 1
@@ -149,9 +154,9 @@ GRAPHICS-WINDOW
 0
 1
 0
-4
+50
 0
-4
+50
 1
 1
 1
@@ -199,19 +204,19 @@ CHOOSER
 151
 priority
 priority
-"None" "Young Male" "Young Female" "Old Male" "Old Female" "Young" "Old" "Male" "Female" "Distance to exit"
-2
+"None" "Male" "Female" "Distance to exit"
+1
 
 SLIDER
 64
 158
 236
 191
-n_young_male
-n_young_male
+n_male
+n_male
 0
 100
-3.0
+48.0
 1
 1
 NIL
@@ -222,41 +227,11 @@ SLIDER
 201
 236
 234
-n_young_female
-n_young_female
+n_female
+n_female
 0
 100
-3.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-65
-248
-237
-281
-n_old_male
-n_old_male
-0
-100
-50.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-65
-294
-237
-327
-n_old_female
-n_old_female
-0
-100
-50.0
+48.0
 1
 1
 NIL
