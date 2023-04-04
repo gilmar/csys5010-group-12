@@ -6,7 +6,11 @@ breed [exits exit]
 breed [people person]
 people-own [target group]
 
-globals [watched]
+globals [
+  watched
+  ticks_to_evacuate_females
+  ticks_to_evacuate_males
+]
 
 to setup
 
@@ -14,6 +18,10 @@ to setup
   let box_x_patches  50
   let box_y_patches  50
   let n_patches (box_x_patches * box_y_patches)
+
+  ;initialize monitors
+  set ticks_to_evacuate_females 0
+  set ticks_to_evacuate_males 0
 
   clear-all
   ;add one to account for the borders
@@ -98,9 +106,20 @@ to go
     go-by-group
     ;notice that "None" orders by group, but as groups are 0 it acts as if it was random
   ]
+  let n_males count people with [color = blue]
+  let n_females count people with [color = pink]
+  ;; all males evacuated
+  if (n_males = 0 and ticks_to_evacuate_males = 0) [
+    set ticks_to_evacuate_males ticks
+  ]
+  ;; all females evacuated
+  if (n_females = 0 and ticks_to_evacuate_females = 0) [
+    set ticks_to_evacuate_females ticks
+  ]
   ;stop if no more people
-  if (count people = 0)
-  [ stop ]
+  if (count people = 0) [
+    stop
+  ]
   tick
 end
 
@@ -235,7 +254,7 @@ CHOOSER
 priority
 priority
 "None" "Male" "Female" "Distance to exit"
-2
+0
 
 SLIDER
 64
@@ -293,6 +312,28 @@ MONITOR
 55
 Number of ticks
 ticks
+17
+1
+11
+
+MONITOR
+1121
+10
+1296
+55
+Ticks to evacuate all males
+ticks_to_evacuate_males
+17
+1
+11
+
+MONITOR
+1302
+10
+1489
+55
+Ticks to evacuate all females
+ticks_to_evacuate_females
 17
 1
 11
