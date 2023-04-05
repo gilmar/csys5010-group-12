@@ -52,6 +52,13 @@ to setup
     ask patch-here [ set pcolor white ]
   ]
 
+  create-exits 1 [
+    setxy max-pxcor (round(max-pycor / 2) - 1)
+    set shape "square"
+    set color white
+    ask patch-here [ set pcolor white ]
+  ]
+
   ;create people
   let n_people round(population_density * n_patches)
   let n_priority round(priority_proportion * n_people)
@@ -84,7 +91,7 @@ to setup
     set group group_female
     set color pink
     move-to one-of patches with [not any? people-here and not any? exits-here and pcolor = white]
-    set target one-of exits
+    set target min-one-of exits [distance myself]
     face target
   ]
 
@@ -92,7 +99,7 @@ to setup
     set group group_male
     set color blue
     move-to one-of patches with [not any? people-here and not any? exits-here and pcolor = white]
-    set target one-of exits
+    set target min-one-of exits [distance myself]
     face target
   ]
 
@@ -254,7 +261,7 @@ CHOOSER
 priority
 priority
 "None" "Male" "Female" "Distance to exit"
-0
+2
 
 SLIDER
 64
@@ -265,7 +272,7 @@ population_density
 population_density
 0
 1
-0.5
+0.3
 0.1
 1
 NIL
