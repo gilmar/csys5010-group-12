@@ -8,24 +8,32 @@ people-own [target group]
 
 globals [
   watched
-  ticks_to_evacuate_females
-  ticks_to_evacuate_males
+  ticks_to_evacuate_greens
+  ticks_to_evacuate_blues
+  n_blues
+  n_greens
+  box_x_patches
+  box_y_patches
 ]
 
 to setup
 
+  clear-all
+
   ;create world
-  let box_x_patches  50
-  let box_y_patches  50
+  set box_x_patches 50
+  set box_y_patches 50
   let n_patches (box_x_patches * box_y_patches)
+  let x_max (box_x_patches + 1)
+  let y_max (box_y_patches + 1)
 
   ;initialize monitors
-  set ticks_to_evacuate_females 0
-  set ticks_to_evacuate_males 0
+  set ticks_to_evacuate_greens 0
+  set ticks_to_evacuate_blues 0
 
-  clear-all
   ;add one to account for the borders
-  resize-world 0 (box_x_patches + 1) 0 (box_y_patches + 1)
+  ;resize-world 0 (box_x_patches + 1) 0 (box_y_patches + 1)
+  resize-world 0 x_max 0 y_max
   ifelse (n_patches < 100) [
     set-patch-size 50
   ][
@@ -52,51 +60,51 @@ to setup
     ask patch-here [ set pcolor white ]
   ]
 
-  create-exits 1 [
-    setxy max-pxcor (round(max-pycor / 2) - 1)
-    set shape "square"
-    set color white
-    ask patch-here [ set pcolor white ]
-  ]
+;  create-exits 1 [
+;    setxy max-pxcor (round(max-pycor / 2) - 1)
+;    set shape "square"
+;    set color white
+;    ask patch-here [ set pcolor white ]
+;  ]
 
   ;create people
   let n_people round(population_density * n_patches)
   let n_priority round(priority_proportion * n_people)
   let n_non_priority (n_people - n_priority)
 
-  let n_male round(n_people / 2)
-  let n_female round(n_people / 2)
-  let group_male 0
-  let group_female 0
+  set n_blues round(n_people / 2)
+  set n_greens round(n_people / 2)
+  let group_blue 0
+  let group_green 0
 
 
   (ifelse
-    (priority = "Male")
+    (priority = "Blue")
     [
-      set n_male n_priority
-      set group_male 1
-      set n_female n_non_priority
-      set group_female 2
+      set n_blues n_priority
+      set group_blue 1
+      set n_greens n_non_priority
+      set group_green 2
     ]
-    (priority = "Female")
+    (priority = "Green")
     [
-      set n_female n_priority
-      set group_female 1
-      set n_male n_non_priority
-      set group_male 2
+      set n_greens n_priority
+      set group_green 1
+      set n_blues n_non_priority
+      set group_blue 2
     ]
   )
 
-  create-people n_female [
-    set group group_female
-    set color pink
+  create-people n_greens [
+    set group group_green
+    set color green
     move-to one-of patches with [not any? people-here and not any? exits-here and pcolor = white]
     set target min-one-of exits [distance myself]
     face target
   ]
 
-  create-people n_male [
-    set group group_male
+  create-people n_blues [
+    set group group_blue
     set color blue
     move-to one-of patches with [not any? people-here and not any? exits-here and pcolor = white]
     set target min-one-of exits [distance myself]
@@ -113,15 +121,15 @@ to go
     go-by-group
     ;notice that "None" orders by group, but as groups are 0 it acts as if it was random
   ]
-  let n_males count people with [color = blue]
-  let n_females count people with [color = pink]
-  ;; all males evacuated
-  if (n_males = 0 and ticks_to_evacuate_males = 0) [
-    set ticks_to_evacuate_males ticks
+  set n_blues count people with [color = blue]
+  set n_greens count people with [color = green]
+  ;; all blues evacuated
+  if (n_blues = 0 and ticks_to_evacuate_blues = 0) [
+    set ticks_to_evacuate_blues ticks
   ]
-  ;; all females evacuated
-  if (n_females = 0 and ticks_to_evacuate_females = 0) [
-    set ticks_to_evacuate_females ticks
+  ;; all greens evacuated
+  if (n_greens = 0 and ticks_to_evacuate_greens = 0) [
+    set ticks_to_evacuate_greens ticks
   ]
   ;stop if no more people
   if (count people = 0) [
@@ -260,7 +268,7 @@ CHOOSER
 151
 priority
 priority
-"None" "Male" "Female" "Distance to exit"
+"None" "Blue" "Green" "Distance to exit"
 2
 
 SLIDER
@@ -272,7 +280,7 @@ population_density
 population_density
 0
 1
-0.3
+0.5
 0.1
 1
 NIL
@@ -287,7 +295,7 @@ priority_proportion
 priority_proportion
 0
 1
-0.5
+0.8
 0.1
 1
 NIL
@@ -309,8 +317,8 @@ true
 true
 "" ""
 PENS
-"Males" 1.0 0 -13345367 true "" "plot count turtles with [color = blue]"
-"Females" 1.0 0 -2064490 true "" "plot count turtles with [color = pink]"
+"blues" 1.0 0 -13345367 true "" "plot count turtles with [color = blue]"
+"greens" 1.0 0 -10899396 true "" "plot count turtles with [color = green]"
 
 MONITOR
 1003
@@ -328,8 +336,8 @@ MONITOR
 10
 1296
 55
-Ticks to evacuate all males
-ticks_to_evacuate_males
+Ticks to evacuate all blues
+ticks_to_evacuate_blues
 17
 1
 11
@@ -339,8 +347,8 @@ MONITOR
 10
 1489
 55
-Ticks to evacuate all females
-ticks_to_evacuate_females
+Ticks to evacuate all greens
+ticks_to_evacuate_greens
 17
 1
 11

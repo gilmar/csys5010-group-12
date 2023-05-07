@@ -1,0 +1,92 @@
+---
+title: "Study of right-of-way restrictions on population evacuations from enclosed spaces"
+output: html_notebook
+---
+
+# Packages instalation
+
+## Pre-reqs
+
+### MacOS
+
+brew install udunits pkg-config gdal
+
+Uncomment the lines below to install the required packages
+
+```{r include=FALSE}
+#install.packages("nlrx", dependencies=TRUE)
+library(ggplot2)
+library(nlrx)
+library(dplyr)
+```
+
+
+
+```{r}
+Sys.setenv(JAVA_HOME = "/usr/local/Cellar/openjdk/20/libexec/openjdk.jdk/Contents/Home")
+netlogopath = file.path("/Applications/NetLogo\ 6.3.0")
+modelpath = file.path("./group-12.nlogo")
+outpath = file.path("/tmp")
+
+# Setup nl object
+nl = nl(nlversion = "6.0.3",
+         nlpath = netlogopath,
+         modelpath = modelpath,
+         jvmmem = 1024)
+```
+
+```{r}
+nl@experiment = experiment(expname = "group-12",
+                           outpath = outpath,
+                           repetition = 1,
+                           tickmetrics = "true",
+                           idsetup = "setup",
+                           idgo = "go",
+                           runtime = 0,
+                           metrics = c("ticks", "n_blues", "n_greens"),
+                           variables = list(priority=list(values=c("\"None\"","\"Green\""))),
+                           constants = list("population_density"=0.5,
+                                            "priority_proportion"=0.5)
+                           )
+
+```
+
+```{r}
+nl@simdesign = simdesign_distinct(nl=nl, nseeds=100)
+```
+
+```{r}
+# Evaluate nl object:
+eval_variables_constants(nl)
+print(nl)
+
+# Run all simulations (loop over all siminputrows and simseeds)
+results = run_nl_all(nl)
+```
+
+```{r}
+# Attach results to nl object:
+setsim(nl, "simoutput") = results
+
+# Write output to outpath of experiment within nl
+write_simoutput(nl)
+
+summary(results)
+```
+# Graphs
+
+```{r}
+ggplot(results[results$ticks != 0,], aes(ticks, n_greens, group=interaction(`random-seed`,priority), color=priority)) +
+    geom_line() +
+    labs(title="Number of greens when greens are prioritized vs not priotized", x ="Time", y = "Number of greens") +
+    scale_color_manual(values=c("darkolivegreen2", "darkolivegreen3"))
+
+ggplot(results[results$ticks != 0,], aes(ticks, n_blues, group=interaction(`random-seed`,priority), color=priority)) +
+    geom_line() +
+    labs(title="Number of blues when greens are prioritized vs not priotized", x ="Time", y = "Number of blues") +
+    scale_color_manual(values=c("deepskyblue", "deepskyblue3"))
+ggplot(results[results$ticks != 0 & results$priority == "Green",], aes(x=ticks, group=interaction(`random-seed`,priority))) +
+    geom_line(aes(y=n_blues), color="skyblue") +
+    geom_line(aes(y=n_greens), color="darkolivegreen2") +
+    labs(title="Number of greens and blues when greens are prioritized", x ="Time", y = "Number of people")
+```
