@@ -148,9 +148,11 @@ to move
     die
   ]
   ;if in front of exit, just leave
-  ((distance target = 1) and (not any? people-on target))
+  (distance target = 1)
   [
-    move-to target
+      if (not any? people-on target) [
+        move-to target
+      ] ;else just wait in place
   ][;move to empty patch closest to the target exit, if not blocking a priority group in the imminent cone of view (1 patch, 180 degrees).
     ;empty patches in the imminent cone of view (1 patch, 180 degrees)
     let vacant_patches patches in-cone 1.5 180 with [(pcolor = white) and (not any? people-here)]
@@ -269,7 +271,7 @@ CHOOSER
 priority
 priority
 "None" "Blue" "Green" "Distance to exit"
-2
+0
 
 SLIDER
 64
@@ -280,7 +282,7 @@ population_density
 population_density
 0
 1
-0.2
+0.5
 0.1
 1
 NIL
@@ -295,7 +297,7 @@ priority_proportion
 priority_proportion
 0
 1
-0.2
+0.5
 0.1
 1
 NIL
