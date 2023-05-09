@@ -54,7 +54,7 @@ to setup
 
   ;draw exit
   create-exits 1 [
-    setxy (round(max-pxcor / 2) - 1) max-pycor
+    setxy (round((max-pxcor - 1) / 2)) max-pycor
     set shape "square"
     set color white
     ask patch-here [ set pcolor white ]
@@ -203,8 +203,8 @@ end
 GRAPHICS-WINDOW
 284
 62
-642
-421
+542
+321
 -1
 -1
 50.0
@@ -218,9 +218,9 @@ GRAPHICS-WINDOW
 0
 1
 0
-6
+4
 0
-6
+4
 1
 1
 1
@@ -280,7 +280,7 @@ population_density
 population_density
 0
 1
-0.5
+0.2
 0.1
 1
 NIL
@@ -295,7 +295,7 @@ priority_proportion
 priority_proportion
 0
 1
-0.5
+0.2
 0.1
 1
 NIL
@@ -360,10 +360,10 @@ SLIDER
 98
 box_area
 box_area
-10
+4
 100
-10.0
-10
+6.0
+2
 1
 NIL
 HORIZONTAL
