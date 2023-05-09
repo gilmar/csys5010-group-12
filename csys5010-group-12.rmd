@@ -45,7 +45,8 @@ nl@experiment = experiment(expname = "group-12",
                            runtime = 0,
                            metrics = c("ticks", "n_blues", "n_greens"),
                            variables = list(priority=list(values=c("\"None\"","\"Green\""))),
-                           constants = list("population_density"=0.5,
+                           constants = list("box_area"=100,
+                                            "population_density"=0.5,
                                             "priority_proportion"=0.5)
                            )
 
