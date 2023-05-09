@@ -21,8 +21,8 @@ to setup
   clear-all
 
   ;create world
-  set box_x_patches 50
-  set box_y_patches 50
+  set box_x_patches (box_area / 2)
+  set box_y_patches (box_area / 2)
   let n_patches (box_x_patches * box_y_patches)
   let x_max (box_x_patches + 1)
   let y_max (box_y_patches + 1)
@@ -148,7 +148,7 @@ to move
     die
   ]
   ;if in front of exit, just leave
-  (distance target = 1)
+  ((distance target = 1) and (not any? people-on target))
   [
     move-to target
   ][;move to empty patch closest to the target exit, if not blocking a priority group in the imminent cone of view (1 patch, 180 degrees).
@@ -203,11 +203,11 @@ end
 GRAPHICS-WINDOW
 284
 62
-812
-591
+642
+421
 -1
 -1
-10.0
+50.0
 1
 10
 1
@@ -218,9 +218,9 @@ GRAPHICS-WINDOW
 0
 1
 0
-51
+6
 0
-51
+6
 1
 1
 1
@@ -228,10 +228,10 @@ ticks
 30.0
 
 BUTTON
-65
-65
-129
-98
+63
+246
+127
+279
 NIL
 setup
 NIL
@@ -245,10 +245,10 @@ NIL
 1
 
 BUTTON
-173
-65
-236
-98
+175
+245
+238
+278
 NIL
 go
 T
@@ -295,7 +295,7 @@ priority_proportion
 priority_proportion
 0
 1
-0.8
+0.5
 0.1
 1
 NIL
@@ -352,6 +352,21 @@ ticks_to_evacuate_greens
 17
 1
 11
+
+SLIDER
+65
+65
+237
+98
+box_area
+box_area
+10
+100
+10.0
+10
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
