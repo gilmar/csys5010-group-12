@@ -7,7 +7,7 @@ breed [people person]
 people-own [target group]
 
 globals [
-  watched
+  prob_best_move
   ticks_to_evacuate_greens
   ticks_to_evacuate_blues
   n_blues
@@ -23,9 +23,11 @@ to setup
   ;create world
   set box_x_patches (box_area / 2)
   set box_y_patches (box_area / 2)
+  set prob_best_move 100
   let n_patches (box_x_patches * box_y_patches)
   let x_max (box_x_patches + 1)
   let y_max (box_y_patches + 1)
+
 
   ;initialize monitors
   set ticks_to_evacuate_greens 0
@@ -111,6 +113,18 @@ to setup
     face target
   ]
 
+  ;Watch one person for debugging. DEBUG
+  (ifelse
+    (watching = "Blue")
+    [
+      watch one-of people with [group = group_blue]
+    ]
+    (watching = "Green")
+    [
+      watch one-of people with [group = group_green]
+    ]
+  )
+
   reset-ticks
 end
 
@@ -166,16 +180,16 @@ to move
         ;patches no other priority people are targeting.
         let candidate_patches vacant_patches with [not member? self priority_people_target_patches]
         if (any? candidate_patches) [
-          ;move to candidate patch closest to exit 95% of the time
-          ifelse (random 100 <= 95) [
+          ;move to candidate patch closest to exit prob_best_move% of the time
+          ifelse (random 100 <= prob_best_move) [
               move-to first sort-by [ [a b] -> [ distance a ] of target < [ distance b ] of target ] candidate_patches
           ][
               move-to one-of candidate_patches
           ]
         ];othewise stay at the same place to give righ-of-way to priority group people to move first
       ][ ;no surrounding people
-          ;move to candidate patch closest to exit 95% of the time
-          ifelse (random 100 <= 95) [
+          ;move to candidate patch closest to exit prob_best_move% of the time
+          ifelse (random 100 <= prob_best_move) [
             move-to first sort-by [ [a b] -> [ distance a ] of target < [ distance b ] of target ] vacant_patches
           ][
             move-to one-of vacant_patches
@@ -203,13 +217,13 @@ to go-by-group
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-284
-62
-542
-321
+255
+72
+783
+601
 -1
 -1
-50.0
+10.0
 1
 10
 1
@@ -220,9 +234,9 @@ GRAPHICS-WINDOW
 0
 1
 0
-4
+51
 0
-4
+51
 1
 1
 1
@@ -230,10 +244,10 @@ ticks
 30.0
 
 BUTTON
-63
-246
-127
-279
+34
+256
+98
+289
 NIL
 setup
 NIL
@@ -241,16 +255,16 @@ NIL
 T
 OBSERVER
 NIL
-NIL
+S
 NIL
 NIL
 1
 
 BUTTON
-175
-245
-238
-278
+146
+255
+209
+288
 NIL
 go
 T
@@ -264,50 +278,50 @@ NIL
 1
 
 CHOOSER
-65
-106
-236
-151
+36
+116
+207
+161
 priority
 priority
 "None" "Blue" "Green" "Distance to exit"
-0
+1
 
 SLIDER
-64
-158
-236
-191
+35
+168
+207
+201
 population_density
 population_density
 0
 1
-0.5
+0.4
 0.1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-64
-201
-236
-234
+35
+211
+207
+244
 priority_proportion
 priority_proportion
 0
 1
-0.5
+0.4
 0.1
 1
 NIL
 HORIZONTAL
 
 PLOT
-1003
-59
-1649
-305
+859
+112
+1505
+358
 Number of people over time
 ticks
 number of people
@@ -323,10 +337,10 @@ PENS
 "greens" 1.0 0 -10899396 true "" "plot count turtles with [color = green]"
 
 MONITOR
-1003
-10
-1114
-55
+859
+63
+970
+108
 Number of ticks
 ticks
 17
@@ -334,10 +348,10 @@ ticks
 11
 
 MONITOR
-1121
-10
-1296
-55
+977
+63
+1152
+108
 Ticks to evacuate all blues
 ticks_to_evacuate_blues
 17
@@ -345,10 +359,10 @@ ticks_to_evacuate_blues
 11
 
 MONITOR
-1302
-10
-1489
-55
+1158
+63
+1345
+108
 Ticks to evacuate all greens
 ticks_to_evacuate_greens
 17
@@ -356,19 +370,29 @@ ticks_to_evacuate_greens
 11
 
 SLIDER
-65
-65
-237
-98
+36
+75
+208
+108
 box_area
 box_area
 4
 100
-6.0
+100.0
 2
 1
 NIL
 HORIZONTAL
+
+CHOOSER
+32
+305
+207
+350
+watching
+watching
+"None" "Blue" "Green"
+0
 
 @#$#@#$#@
 ## WHAT IS IT?
